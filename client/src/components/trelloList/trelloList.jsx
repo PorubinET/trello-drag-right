@@ -21,7 +21,7 @@ const ListContainer = styled.div`
     margin-right: 8px;
   `;
 
-const TrelloList = ({ title, cards, _id, index, position, email, name }) => {
+const TrelloList = ({ title, cards, _id, index, position}) => {
 
   let [titleText, setTitle] = useState(title);
   const dispatch = useDispatch();
@@ -77,11 +77,10 @@ const TrelloList = ({ title, cards, _id, index, position, email, name }) => {
                       desc={card.description}
                       listId={card.listId}
                       time={card.time}
+                      userId={card.userId}
                       index={indexCard}
                       indexList={index}
                       cards={cards}
-                      name={name}
-                      email={email}
                     />
                   </Grid>
                 )}

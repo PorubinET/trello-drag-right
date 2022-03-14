@@ -7,26 +7,23 @@ let _id = 10;
 export const listsSlice = createSlice({
     name: 'lists',
     initialState: {
-
-        filter: "all",
-
-        // users: [
-        //     {
-        //         userId: 0,
-        //         name: "John",
-        //         email: "userJohn@mail.ru"
-        //     },
-        //     {
-        //         userId: 1,
-        //         name: "Jack",
-        //         email: "userJack@mail.ru"
-        //     },
-        //     {
-        //         userId: 2,
-        //         name: "Nick",
-        //         email: "userNick@mail.ru"
-        //     },
-        // ],
+        users: [
+            {
+                userId: 0,
+                name: "John",
+                email: "userJohn@mail.ru"
+            },
+            {
+                userId: 1,
+                name: "Jack",
+                email: "userJack@mail.ru"
+            },
+            {
+                userId: 2,
+                name: "Nick",
+                email: "userNick@mail.ru"
+            },
+        ],
 
         lists: [
             {
@@ -36,32 +33,28 @@ export const listsSlice = createSlice({
                 listId: 0,
                 cards: [
                     {
-                        // position: 0,
-                        listId: 0,
+                        userId: 1,
                         id: 3724585,
                         text: "class ",
                         description: "description 1",
                         time: "10.03.2022 21:36"
                     },
                     {
-                        // position: 1,
-                        listId: 0,
+                        userId: 2,
                         id: 8757487,
                         text: "created static 2",
                         description: "description 2",
                         time: "10.03.2022 21:36"
                     },
                     {
-                        // position: 2,
-                        listId: 0,
+                        userId: 0,
                         id: 8743098,
                         text: "created static 3",
                         description: "description 3",
                         time: "10.03.2022 21:36"
                     },
                     {
-                        // position: 3,
-                        listId: 0,
+                        userId: 1,
                         id: 87877798,
                         text: "created static 4",
                         description: "description 4",
@@ -76,40 +69,35 @@ export const listsSlice = createSlice({
                 listId: 1,
                 cards: [
                     {
-                        // position: 0,
-                        listId: 1,
+                        userId: 0,
                         id: 5465765,
                         text: "created static 1",
                         description: "description 1",
                         time: "10.03.2022 21:36"
                     },
                     {
-                        // position: 1,
-                        listId: 1,
+                        userId: 0,
                         id: 21334344,
                         text: "created static 2",
                         description: "description 2",
                         time: "10.03.2022 21:36"
                     },
                     {
-                        // position: 2,
-                        listId: 1,
+                        userId: 0,
                         id: 34656723,
                         text: "created static 3",
                         description: "description 3",
                         time: "10.03.2022 21:36"
                     },
                     {
-                        // position: 3,
-                        listId: 1,
+                        userId: 0,
                         id: 56324235,
                         text: "created static 4",
                         description: "description 4",
                         time: "10.03.2022 21:36"
                     },
                     {
-                        // position: 4,
-                        listId: 1,
+                        userId: 0,
                         id: 2436653,
                         text: "created static 5",
                         description: "description 5",
@@ -124,16 +112,14 @@ export const listsSlice = createSlice({
                 listId: 2,
                 cards: [
                     {
-                        // position: 0,
-                        listId: 2,
+                        userId: 0,
                         id: 7654325,
                         text: "created static 6",
                         description: "description 6",
                         time: "10.03.2022 21:36"
                     },
                     {
-                        // position: 1,
-                        listId: 2,
+                        userId: 0,
                         id: 4665734,
                         text: "created static 7",
                         description: "description 7",
@@ -157,7 +143,7 @@ export const listsSlice = createSlice({
             } = action.payload;
 
             if (type === "list") {
-                console.log("list")
+                console.log("type === list")
                 const list = state.lists.splice(+droppableIndexStart, 1);
                 state.lists.splice(+droppableIndexEnd, 0, ...list)
             }
@@ -169,45 +155,27 @@ export const listsSlice = createSlice({
                 indexCardEnd.cards.splice(0, 0, ...moveCard)
             }
 
+            if (droppableIdStart !== "all-lists" && droppableIdStart === droppableIdEnd && move !== true) {
+                console.log("droppableIdStart !== all-lists")
+                console.log(action.payload)
+                const list = state.lists.find((list) => +droppableIdStart === list.listId)
+                const card = list.cards.splice(+droppableIndexStart, 1)
+                list.cards.splice(+droppableIndexEnd, 0, ...card)
+            }
+
             if (droppableIdStart !== droppableIdEnd) {
+                console.log("droppableIdStart !== all-lists")
+                console.log(action.payload)
                 const listStart = state.lists.find((list) => +droppableIdStart === list.listId)
                 const card = listStart.cards.splice(+droppableIndexStart, 1)
                 const listEnd = state.lists.find((list) => +droppableIdEnd === list.listId)
                 listEnd.cards.splice(+droppableIndexEnd, 0, ...card)
             }
-
-            // if (droppableIdStart !== "all-lists" && droppableIdStart !== droppableIndexEnd ) {
-            //     console.log("all-lists")
-            //     const list = state.lists.find((list) => +droppableIdStart === list.listId)
-            //     const card = list.cards.splice(+droppableIndexStart, 1)
-            //     list.cards.splice(+droppableIndexEnd, 0, ...card)
-            // }
-
-            // if (droppableIdStart !== droppableIdEnd) {
-            //     console.log(2, "<<")
-            //     console.log(action.payload)
-            //     const listStart = state.lists[+action.payload.droppableIdStart]
-            //     const card = listStart.cards.splice(+droppableIndexStart, 1)
-            //     const listEnd = state.lists[+action.payload.droppableIdEnd]
-            //     listEnd.cards.splice(+droppableIndexEnd, 0, ...card)
-            // }
-
-            // if (droppableIdStart !== "all-lists" && droppableIdStart !== droppableIndexEnd ) {
-            //     console.log(3, "<<")
-
-            //     // const list = state.lists[+action.payload.droppableIdStart]
-            //     // const card = list.cards.splice(+droppableIndexStart, 1)
-            //     // list.cards.splice(+droppableIndexEnd, 0, ...card)
-
-            //     // const listStart = state.lists[+action.payload.droppableIdStart]
-            //     // const card = listStart.cards.splice(+droppableIndexStart, 1)
-            //     // const listEnd = state.lists[+action.payload.droppableIdEnd]
-            //     // listEnd.cards.splice(+droppableIndexEnd, 0, ...card)
-            // }
         },
 
         addList(state, action) {
             const newList = {
+                userId: 0,
                 title: action.payload.text,
                 listId: listId,
                 cards: []
@@ -218,6 +186,7 @@ export const listsSlice = createSlice({
 
         addCard(state, action) {
             const newCard = {
+                userId: 0,
                 listId: action.payload.listId,
                 id: `card-${_id}`,
                 text: action.payload.text,

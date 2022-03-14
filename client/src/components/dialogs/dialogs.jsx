@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { useState } from "react";
+import { useDropzone } from 'react-dropzone';
 import { useDispatch, useSelector } from "react-redux";
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
@@ -11,59 +12,43 @@ import EditIcon from '@mui/icons-material/Edit';
 import { Grid } from "@mui/material";
 import { changeCardText, changeCardDesc, sort } from "../../store/listsSlice"
 import Typography from '@mui/material/Typography';
-
-
 import CardHeader from '@mui/material/CardHeader';
 import Avatar from '@mui/material/Avatar';
 import IconButton from '@mui/material/IconButton';
 import { red } from '@mui/material/colors';
-
 import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
 import Card from '@mui/material/Card';
 
-
-
-
-
 import "./dialogs.scss"
 
-export default function FormDialog({ text, id, desc, name, email, time, indexList }) {
+export default function FormDialog({ text, id, desc, time, indexList, userId }) {
 
-  console.log(indexList)
-
-  const [open, setOpen] = React.useState(false);
-  let [profOpen, setProfOpen] = useState(false)
   let [move, setMove] = useState(false)
+  let [openCard, setOpen] = useState(false);
+  let [profOpen, setProfOpen] = useState(false)
   let [textCard, setTextCard] = useState(text);
   let [descCard, setDescCard] = useState(desc);
 
-  const lists = useSelector(state => state.lists.lists)
-
-  // console.log(lists.map(list => list.title))
-
   const dispatch = useDispatch();
+  const lists = useSelector(state => state.lists.lists)
+  const users = useSelector(state => state.lists.users)
+  const currentUser = users.find(user => user.userId === userId)
 
-  const changeText = (e) => {
-    setTextCard(textCard = e.target.value)
-  }
-
-  const changeDesc = (e) => {
-    setDescCard(textCard = e.target.value)
-  }
+  const changeText = (e) => { setTextCard(textCard = e.target.value) }
+  const changeDesc = (e) => { setDescCard(textCard = e.target.value) }
 
   const handleClickOpen = () => {
-    setOpen(true);
+    setOpen(openCard === true ? false : true);
   };
 
   const clickProfOpen = () => {
-    setProfOpen(profOpen = true)
+    setProfOpen(profOpen === true ? false : true)
   }
 
-  const handleClose = () => {
-    setProfOpen(false)
-    setOpen(false);
-  };
+  const dragCard = () => {
+    setMove(move === true ? false : true)
+  }
 
   const handleKeyDown = (e) => {
     if (e.keyCode === 13) {
@@ -72,23 +57,26 @@ export default function FormDialog({ text, id, desc, name, email, time, indexLis
     }
   }
 
-  const openMove = () => {
-    setMove(true)
-  }
-
-  const closeMove = () => {
-    setMove(false)
-  }
-
   const setDate = () => {
     dispatch(changeCardText({ id, indexList, text: textCard }))
     dispatch(changeCardDesc({ id, indexList, desc: descCard }))
-    handleClose()
+    handleClickOpen()
   }
 
-  const moveRight = (indexEnd) => {
-    dispatch(sort({ indexStart: indexList, id, indexEnd, move}))
+  const moveCard = (indexEnd) => {
+    dispatch(sort({ indexStart: indexList, id, indexEnd, move }))
   }
+
+  const { getRootProps, getInputProps, open, acceptedFiles } = useDropzone({
+    noClick: true,
+    noKeyboard: true
+  });
+
+  const files = acceptedFiles.map(file => (
+    <li key={file.path}>
+      {file.path} - {file.size} bytes
+    </li>
+  ));
 
   return (
     <div>
@@ -98,15 +86,15 @@ export default function FormDialog({ text, id, desc, name, email, time, indexLis
         <span className="card__text-wrapp">{text}</span>
       </Typography>
 
-      <Dialog open={open} onClose={handleClose}>
+      <Dialog open={openCard} onClose={handleClickOpen}>
         <DialogTitle style={{ display: "flex", justifyContent: "space-between" }}>
 
-          <Dialog open={move} onClose={closeMove}>
+          <Dialog open={move} onClose={dragCard}>
             {lists.map((list, index) =>
               <Button
                 key={index}
                 index={index}
-                onClick={() => moveRight(index)}
+                onClick={() => moveCard(index)}
               >
                 {list.title}
               </Button>
@@ -125,26 +113,30 @@ export default function FormDialog({ text, id, desc, name, email, time, indexLis
             onChange={changeText}
             style={{ width: "30%" }}
           />
-          <CardHeader
-            action={
-              <IconButton aria-label="settings" onClick={clickProfOpen}>
-                <Avatar sx={{ bgcolor: red[500] }} aria-label="recipe">
-                  J
-                </Avatar>
-              </IconButton>
-            }
-            title={name}
-            style={{ textAlign: "right" }}
-          />
-          <Dialog open={profOpen} onClose={handleClose}>
+          <Grid>
+
+            <CardHeader
+              action={
+                <IconButton aria-label="settings" onClick={clickProfOpen}>
+                  <Avatar sx={{ bgcolor: red[500] }} aria-label="recipe">
+                    {currentUser.name[0]}
+                  </Avatar>
+                </IconButton>
+              }
+              title={currentUser.name}
+              style={{ textAlign: "right" }}
+            />
+
+          </Grid>
+          <Dialog open={profOpen} onClose={clickProfOpen}>
             <Card sx={{ maxWidth: 345 }}>
               <CardContent style={{ width: "320px", display: "flex", justifyContent: "space-between" }}>
                 <Grid style={{ textAlign: "left" }}>
                   <Typography variant="body2" color="text.secondary">
-                    <span>{name}</span>
+                    <span>{currentUser.name}</span>
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    <span>{email}</span>
+                    <span>{currentUser.email}</span>
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
                     <span>8989-888-88-88</span>
@@ -152,23 +144,24 @@ export default function FormDialog({ text, id, desc, name, email, time, indexLis
                 </Grid>
                 <Grid>
                   <Avatar sx={{ bgcolor: red[500], width: "60px", height: "60px" }} aria-label="recipe">
-                    J
+                    {currentUser.name[0]}
                   </Avatar>
                 </Grid>
               </CardContent>
               <CardActions style={{ justifyContent: "space-between" }}>
-                <Button size="small" onClick={handleClose}>Close</Button>
+                <Button size="small" onClick={clickProfOpen}>Close</Button>
                 <Button size="small">Learn More</Button>
               </CardActions>
             </Card>
           </Dialog>
         </DialogTitle>
 
-        <DialogContent style={{ width: 550 }}>
+        <DialogContent style={{ width: 550, minHeight: 240 }}>
           <Grid
             marginTop={2}
             display="flex"
-            justifyContent="center">
+            flexDirection="column"
+          >
             <TextField
               type="text"
               onChange={changeDesc}
@@ -176,17 +169,25 @@ export default function FormDialog({ text, id, desc, name, email, time, indexLis
               label="Description"
               variant="outlined"
               value={descCard}
-              style={{ width: "100%" }}
+              style={{ width: "100%", marginBottom: "10px" }}
               multiline
             />
+            <div className="dialog__file-wrapp">
+              <div {...getRootProps({ className: 'dropzone' })}>
+                <input {...getInputProps()} />
+                <Button onClick={open}>Add File</Button>
+              </div>
+              <aside>
+                <ul>{files}</ul>
+              </aside>
+            </div>
           </Grid>
         </DialogContent>
 
         <span className='dialogs__time'>{time}</span>
         <DialogActions>
-          <Button onClick={openMove}>move card</Button>
-          {/* <Button onClick={moveRight}>move right</Button> */}
-          <Button onClick={handleClose}>Close</Button>
+          <Button onClick={dragCard}>move card</Button>
+          <Button onClick={handleClickOpen}>Close</Button>
           <Button onClick={setDate}>Ok</Button>
         </DialogActions>
       </Dialog>

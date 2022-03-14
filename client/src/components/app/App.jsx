@@ -20,8 +20,6 @@ function App() {
   const dispatch = useDispatch();
 
   const lists = useSelector(state => state.lists.lists)
-  console.log(lists)
-
   const onDragEnd = (result) => {
     const { destination, source, draggableId, type } = result
 
@@ -54,7 +52,6 @@ function App() {
                 name={list.name}
                 email={list.email}
                 index={index}
-                // lists={lists}
               />
             )}
             {provided.placeholder}

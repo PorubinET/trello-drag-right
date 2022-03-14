@@ -12,7 +12,7 @@ const CardContainer = styled.div`
   margin-bottom: 8px;
 `
 
-const TrelloCard = ({ text, id, indexList, index, listId, desc, name, email, time }) => {
+const TrelloCard = ({ text, id, indexList, index, listId, desc, time, userId }) => {
   
   return (
     <Draggable draggableId={String(id)} index={index}>
@@ -32,9 +32,8 @@ const TrelloCard = ({ text, id, indexList, index, listId, desc, name, email, tim
                   index={index}
                   listId={listId}
                   desc={desc}
-                  name={name}
-                  email={email}
                   time={time}
+                  userId={userId}
                   indexList={indexList}
                 />
               </CardContent>
